@@ -7,8 +7,8 @@ The script allows to publish random comics from xkcd website to needed VK group 
 pip install -r requirements.txt
 ```
 - Create a file **tokens.env** to store environment variables.
-- VK user access token is needed. Follow instructions [VK API](https://dev.vk.com/api/access-token/implicit-flow-user) for gaining the token.
-Save your token in tokens.env file under variable **VK_ACCESS_TOKEN**
+- VK user access token is needed. Follow instructions [VK API](https://dev.vk.com/api/access-token/implicit-flow-user) for gaining the token.  
+Save your token in **tokens.env** file under variable **VK_ACCESS_TOKEN**
 - Save your user id in **tokens.env**  file under variable **VK_CLIENT_ID**. You can check your user id [here](https://regvk.com/id/)
 - Save your group id in **tokens.env**  file  under variable **VK_GROUP_ID**. You can check your group id [here](https://regvk.com/id/)
 ## How to use
