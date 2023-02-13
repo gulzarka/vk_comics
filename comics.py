@@ -19,9 +19,9 @@ def get_random_img_num():
 def fetch_img(img_num):
     response = requests.get(f'https://xkcd.com/{img_num}/info.0.json')
     response.raise_for_status()
-    img_items = response.json()
-    img_url = img_items['img']
-    comment = img_items['alt']
+    response_content = response.json()
+    img_url = response_content['img']
+    comment = response_content['alt']
     filename = f'comic_pic_{img_num}.png'
     return img_url, filename, comment
 
@@ -39,14 +39,15 @@ def raise_vk_error(response):
         raise requests.HTTPError(response['error']['error_msg'])
 
 
-def get_server(access_token, group_id):
+def get_server_url(access_token, group_id):
     url = f'{VK_API_URL}photos.getWallUploadServer'
     params = {'group_id': group_id, 'access_token': access_token,
               'v': VK_API_VER}
     response = requests.get(url, params=params)
     response.raise_for_status()
-    raise_vk_error(response.json())
-    upload_server_url = response.json()['response']['upload_url']
+    response_content = response.json()
+    raise_vk_error(response_content)
+    upload_server_url = response_content['response']['upload_url']
     return upload_server_url
 
 
@@ -55,11 +56,12 @@ def upload_img(img, server_url):
         file = {'photo': file}
         response = requests.post(server_url, files=file)
     response.raise_for_status()
-    raise_vk_error(response.json())
-    img_data = response.json()
-    server = img_data['server']
-    photo = img_data['photo']
-    hash = img_data['hash']
+    response_content = response.json()
+    raise_vk_error(response_content)
+    response_content = response.json()
+    server = response_content['server']
+    photo = response_content['photo']
+    hash = response_content['hash']
     return server, photo, hash
 
 
@@ -71,10 +73,11 @@ def save_img(group_id, access_token, user_id, server, photo, hash):
               'access_token': access_token}
     response = requests.post(url, params=params)
     response.raise_for_status()
-    raise_vk_error(response.json())
-    saved_img_items = response.json()['response'][0]
-    media_id = saved_img_items['id']
-    owner_id = saved_img_items['owner_id']
+    response_content = response.json()
+    raise_vk_error(response_content)
+    filtered_response_content = response_content['response'][0]
+    media_id = filtered_response_content['id']
+    owner_id = filtered_response_content['owner_id']
     return media_id, owner_id
 
 
@@ -86,8 +89,9 @@ def post_img(group_id, access_token, comment, media_id, owner_id):
               'access_token': access_token, 'v': VK_API_VER}
     response = requests.post(url, params=params)
     response.raise_for_status()
-    raise_vk_error(response.json())
-    return response.json()
+    response_content = response.json()
+    raise_vk_error(response_content)
+    return response_content
 
 
 def main():
@@ -99,7 +103,7 @@ def main():
         img_num = get_random_img_num()
         img_url, filename, comment = fetch_img(img_num)
         img = write_img(img_url, filename)
-        server_url = get_server(access_token, group_id)
+        server_url = get_server_url(access_token, group_id)
         server, photo, hash = upload_img(img, server_url)
         media_id, owner_id = save_img(group_id, access_token,
                                       user_id, server, photo,
